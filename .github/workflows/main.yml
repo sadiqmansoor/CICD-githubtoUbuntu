@@ -3,7 +3,7 @@ name: Build and Deploy .NET Core Console App to Ubuntu EC2
 on:
   push:
     branches:
-      - master  # Trigger on push to main
+      - master  # Trigger on push to master
 
 jobs:
   build-and-deploy:
@@ -16,16 +16,16 @@ jobs:
     - name: 🧰 Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'  # Adjust to your target version
+        dotnet-version: '8.0.x'  # Match your target framework
 
     - name: 📦 Restore dependencies
       run: dotnet restore
 
-    - name: 🛠️ Build application
+    - name: 🛠️ Build application (solution or project)
       run: dotnet build --configuration Release
 
     - name: 🚀 Publish application for Ubuntu
-      run: dotnet publish -c Release -r linux-x64 --self-contained -o ./publish
+      run: dotnet publish ./src/YourProject/YourProject.csproj -c Release -r linux-x64 --self-contained -o ./publish
 
     - name: 📤 Upload published app to EC2 via SCP
       run: |
@@ -37,6 +37,6 @@ jobs:
         echo "Starting app on EC2..."
         ssh -i ${{ secrets.EC2_SSH_KEY }} ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
           cd /home/ubuntu/app
-          chmod +x yourAppExecutable  # Replace with actual filename
-          ./yourAppExecutable &
+          chmod +x YourAppExecutable  # Replace with actual filename
+          ./YourAppExecutable &
         EOF
