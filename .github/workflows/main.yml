@@ -32,8 +32,9 @@ jobs:
         echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
         chmod 600 key.pem
 
-    - name: 🧠 Add EC2 host to known_hosts
+    - name: 🧠 Create .ssh and add EC2 host to known_hosts
       run: |
+        mkdir -p ~/.ssh
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
         
     - name: 📤 Upload published app to EC2 via SCP
