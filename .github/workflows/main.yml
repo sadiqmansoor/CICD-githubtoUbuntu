@@ -25,7 +25,7 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: 🚀 Publish application for Ubuntu
-      run: dotnet publish ./src/YourProject/YourProject.csproj -c Release -r linux-x64 --self-contained -o ./publish
+      run: dotnet publish .CICD-githubtoUbuntu.csproj -c Release -r linux-x64 --self-contained -o ./publish
 
     - name: 📤 Upload published app to EC2 via SCP
       run: |
