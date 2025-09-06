@@ -16,29 +16,35 @@ jobs:
     - name: 🧰 Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'  # Match your target framework
+        dotnet-version: '8.0.x'  # Adjust to your target version
 
     - name: 📦 Restore dependencies
-      run: dotnet restore
+      run: dotnet restore CICD-githubtoUbuntu.csproj
 
-    - name: 🛠️ Build application (solution or project)
-      run: dotnet build --configuration Release
+    - name: 🛠️ Build application
+      run: dotnet build CICD-githubtoUbuntu.csproj --configuration Release
 
     - name: 🚀 Publish application for Ubuntu
       run: dotnet publish CICD-githubtoUbuntu.csproj -c Release -r linux-x64 --self-contained -o ./publish
 
-     - name: 🗝️ Create SSH key file
-      run: echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
-      chmod 600 key.pem
+    - name: 🗝️ Write SSH key to file
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+        chmod 600 key.pem
 
     - name: 📤 Upload published app to EC2 via SCP
-    run: echo "Uploading to EC2..."
-    scp -i key.pem -r ./publish ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/app
+      run: |
+        echo "Uploading to EC2..."
+        scp -i key.pem -r ./publish ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/app
 
     - name: 🧨 Run app remotely via SSH
-    run: echo "Starting app on EC2..."
-    ssh -i key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-      cd /home/ubuntu/app
-      chmod +x YourAppExecutable  # Replace with actual filename
-      ./YourAppExecutable &
-    EOF
+      run: |
+        echo "Starting app on EC2..."
+        ssh -i key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+          cd /home/ubuntu/app
+          chmod +x CICD-githubtoUbuntu  # Replace with actual executable name if different
+          ./CICD-githubtoUbuntu &
+        EOF
+
+    - name: 🧹 Clean up SSH key
+      run: rm key.pem
